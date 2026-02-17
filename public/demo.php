@@ -6,12 +6,12 @@
  * php -S localhost:8080 demo.php
  */
 
-require_once __DIR__ . '/src/Enums/FaceType.php';
-require_once __DIR__ . '/src/Enums/Variant.php';
-require_once __DIR__ . '/src/Data/FacehashData.php';
-require_once __DIR__ . '/src/Data/FaceSvgData.php';
-require_once __DIR__ . '/src/Support/SvgRenderer.php';
-require_once __DIR__ . '/src/Facehash.php';
+require_once __DIR__ . '/../src/Enums/FaceType.php';
+require_once __DIR__ . '/../src/Enums/Variant.php';
+require_once __DIR__ . '/../src/Data/FacehashData.php';
+require_once __DIR__ . '/../src/Data/FaceSvgData.php';
+require_once __DIR__ . '/../src/Support/SvgRenderer.php';
+require_once __DIR__ . '/../src/Facehash.php';
 
 use Saade\Facehash\Facehash;
 
