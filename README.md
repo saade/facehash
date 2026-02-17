@@ -1,5 +1,7 @@
 # Facehash for Laravel
 
+![Facehash](art/cover.png)
+
 Deterministic avatar faces from any string. A PHP/Laravel port of the [facehash](https://facehash.dev) JavaScript library.
 
 Generates unique, consistent SVG avatars based on a name, email, or any string input. No GD, Imagick, or external services required — pure SVG output.
