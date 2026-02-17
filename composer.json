@@ -1,0 +1,34 @@
+{
+  "name": "saade/facehash",
+  "description": "Deterministic avatar faces from any string. Lightweight, pure SVG output. Laravel integration.",
+  "keywords": [
+    "facehash",
+    "avatar",
+    "laravel",
+    "deterministic",
+    "identicon",
+    "svg"
+  ],
+  "license": "MIT",
+  "require": {
+    "php": "^8.2",
+    "illuminate/support": "^11.0|^12.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Saade\\Facehash\\": "src/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Saade\\Facehash\\FacehashServiceProvider"
+      ],
+      "aliases": {
+        "Facehash": "Saade\\Facehash\\Facades\\Facehash"
+      }
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
