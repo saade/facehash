@@ -7,128 +7,48 @@
  */
 
 require_once __DIR__ . '/../src/Enums/FaceType.php';
+require_once __DIR__ . '/../src/Enums/Format.php';
 require_once __DIR__ . '/../src/Enums/Variant.php';
 require_once __DIR__ . '/../src/Data/FacehashData.php';
 require_once __DIR__ . '/../src/Data/FaceSvgData.php';
 require_once __DIR__ . '/../src/Support/SvgRenderer.php';
 require_once __DIR__ . '/../src/Facehash.php';
 
-use Saade\Facehash\Data\FacehashData;
-use Saade\Facehash\Data\FaceSvgData;
-use Saade\Facehash\Enums\FaceType;
+use Saade\Facehash\Facehash;
 
-// ---------------------------------------------------------------------------
-// Hash + compute helpers (mirrors Facehash internals)
-// ---------------------------------------------------------------------------
-
-function stringHash(string $str): int
-{
-    $hash = 0;
-    for ($i = 0, $len = strlen($str); $i < $len; $i++) {
-        $hash = (($hash << 5) - $hash + ord($str[$i])) & 0xFFFFFFFF;
-    }
-    if ($hash >= 0x80000000) {
-        $hash -= 0x100000000;
-    }
-    return abs($hash);
-}
-
-function computeFace(string $name): array
-{
-    $colors = ['#ec4899', '#f59e0b', '#3b82f6', '#f97316', '#10b981'];
-    $positions = [
-        ['x' => -1, 'y' => 1], ['x' => 1, 'y' => 1], ['x' => 1, 'y' => 0],
-        ['x' => 0, 'y' => 1], ['x' => -1, 'y' => 0], ['x' => 0, 'y' => 0],
-        ['x' => 0, 'y' => -1], ['x' => -1, 'y' => -1], ['x' => 1, 'y' => -1],
-    ];
-    $faceTypes = FaceType::cases();
-
-    $hash = stringHash($name);
-
-    $faceType = $faceTypes[$hash % count($faceTypes)];
-    $color = $colors[$hash % count($colors)];
-    $rotation = $positions[$hash % count($positions)];
-    $initial = mb_strtoupper(mb_substr($name, 0, 1));
-    $tilt = (($hash % 21) - 10) * 0.8; // -8 to +8 degrees
-
-    return compact('faceType', 'color', 'rotation', 'initial', 'tilt');
-}
-
-// ---------------------------------------------------------------------------
-// Render a single square avatar as inline HTML
-// ---------------------------------------------------------------------------
-
-function renderSquareAvatar(string $name, int $size = 70): string
-{
-    $data = computeFace($name);
-    $svgData = FaceSvgData::get($data['faceType']);
-    $viewBox = $svgData['viewBox'];
-    $paths = $svgData['paths'];
-
-    $vbParts = explode(' ', $viewBox);
-    $vbW = (float) $vbParts[2];
-    $vbH = (float) $vbParts[3];
-    $aspect = $vbW / $vbH;
-
-    $faceW = $size * 0.55;
-    $faceH = $faceW / $aspect;
-    $fontSize = $size * 0.28;
-
-    $offsetMag = $size * 0.04;
-    $ox = $data['rotation']['y'] * $offsetMag;
-    $oy = -$data['rotation']['x'] * $offsetMag;
-
-    $radius = $size * 0.18;
-    $c = $data['color'];
-    $tilt = $data['tilt'];
-
-    $pathsHtml = '';
-    foreach ($paths as $d) {
-        $pathsHtml .= '<path d="' . $d . '" fill="rgba(0,0,0,0.75)"/>';
-    }
-
-    return <<<HTML
-    <div class="card" style="transform:rotate({$tilt}deg)">
-        <div class="avatar" style="width:{$size}px;height:{$size}px;background:{$c};border-radius:{$radius}px;">
-            <div class="gradient-overlay" style="border-radius:{$radius}px;"></div>
-            <div class="face" style="margin-left:{$ox}px;margin-top:{$oy}px;">
-                <svg viewBox="{$viewBox}" width="{$faceW}" height="{$faceH}" fill="none" xmlns="http://www.w3.org/2000/svg">{$pathsHtml}</svg>
-                <span class="initial" style="font-size:{$fontSize}px;">{$data['initial']}</span>
-            </div>
-        </div>
-        <span class="name">{$name}</span>
-    </div>
-    HTML;
-}
+$facehash = new Facehash;
 
 // ---------------------------------------------------------------------------
 // Avatar positions (percentages) — scattered around the perimeter
 // ---------------------------------------------------------------------------
 
+$formats = ['square', 'squircle', 'circle'];
+$variants = ['gradient', 'solid'];
+
 $avatars = [
     // Top edge
-    ['name' => 'alice',   'x' => 5,  'y' => 5],
-    ['name' => 'bob',     'x' => 17, 'y' => 1],
-    ['name' => 'charlie', 'x' => 31, 'y' => 7],
-    ['name' => 'diana',   'x' => 64, 'y' => 2],
-    ['name' => 'eve',     'x' => 80, 'y' => 5],
-    ['name' => 'frank',   'x' => 93, 'y' => 1],
+    ['name' => 'alice',   'x' => 12, 'y' => 15],
+    ['name' => 'bob',     'x' => 25, 'y' => 10],
+    ['name' => 'charlie', 'x' => 38, 'y' => 16],
+    ['name' => 'diana',   'x' => 56, 'y' => 11],
+    ['name' => 'eve',     'x' => 68, 'y' => 15],
+    ['name' => 'frank',   'x' => 82, 'y' => 10],
 
     // Left edge
-    ['name' => 'grace',   'x' => 1,  'y' => 32],
-    ['name' => 'henry',   'x' => 4,  'y' => 53],
+    ['name' => 'grace',   'x' => 10, 'y' => 38],
+    ['name' => 'henry',   'x' => 12, 'y' => 55],
 
     // Right edge
-    ['name' => 'ivy',     'x' => 91, 'y' => 35],
-    ['name' => 'jack',    'x' => 93, 'y' => 55],
+    ['name' => 'ivy',     'x' => 82, 'y' => 40],
+    ['name' => 'jack',    'x' => 84, 'y' => 57],
 
     // Bottom edge
-    ['name' => 'kate',    'x' => 3,  'y' => 78],
-    ['name' => 'leo',     'x' => 18, 'y' => 84],
-    ['name' => 'mia',     'x' => 34, 'y' => 78],
-    ['name' => 'noah',    'x' => 62, 'y' => 83],
-    ['name' => 'olivia',  'x' => 78, 'y' => 80],
-    ['name' => 'paul',    'x' => 93, 'y' => 84],
+    ['name' => 'kate',    'x' => 10, 'y' => 74],
+    ['name' => 'leo',     'x' => 24, 'y' => 78],
+    ['name' => 'mia',     'x' => 38, 'y' => 73],
+    ['name' => 'noah',    'x' => 56, 'y' => 78],
+    ['name' => 'olivia',  'x' => 70, 'y' => 74],
+    ['name' => 'paul',    'x' => 83, 'y' => 78],
 ];
 
 ?>
@@ -213,39 +133,10 @@ $avatars = [
         flex-direction: column;
         align-items: center;
         gap: 6px;
-        transition: transform 0.3s ease;
     }
 
-    .avatar {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
-    }
-
-    .gradient-overlay {
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(ellipse 100% 100% at 30% 30%, rgba(255,255,255,0.12) 0%, transparent 60%);
-        pointer-events: none;
-    }
-
-    .face {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        z-index: 1;
-    }
-
-    .initial {
-        margin-top: 4px;
-        font-family: monospace;
-        font-weight: 700;
-        line-height: 1;
-        color: rgba(0, 0, 0, 0.75);
+    .card svg {
+        filter: drop-shadow(0 4px 24px rgba(0, 0, 0, 0.5));
     }
 
     .name {
@@ -263,9 +154,17 @@ $avatars = [
         <p>beautiful minimalist avatars from any string for Laravel</p>
     </div>
 
-    <?php foreach ($avatars as $a): ?>
+    <?php foreach ($avatars as $i => $a):
+        $hash = crc32($a['name']);
+        $fmt = $formats[abs($hash) % count($formats)];
+        $var = $variants[abs($hash >> 2) % count($variants)];
+        $tilt = (($hash % 21) - 10) * 0.8;
+    ?>
         <div style="position:absolute;left:<?= $a['x'] ?>%;top:<?= $a['y'] ?>%;">
-            <?= renderSquareAvatar($a['name']) ?>
+            <div class="card" style="transform:rotate(<?= $tilt ?>deg)">
+                <?= $facehash->name($a['name'])->size(70)->format($fmt)->variant($var)->blink()->toSvg() ?>
+                <span class="name"><?= htmlspecialchars($a['name']) ?></span>
+            </div>
         </div>
     <?php endforeach; ?>
 

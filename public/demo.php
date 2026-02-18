@@ -84,9 +84,7 @@ $names = ['Saade', 'Alice', 'Bob', 'Charlie', 'Diana', 'Eve', 'Frank', 'Grace', 
     .preview { display: flex; align-items: center; justify-content: center; gap: 2rem; min-height: 180px; }
     .preview-svg { }
     code { background: #262626; padding: 0.125rem 0.5rem; border-radius: 0.25rem; font-size: 0.8rem; color: #ec4899; }
-    .face-types { display: flex; gap: 2rem; flex-wrap: wrap; }
-    .face-type-card { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; background: #171717; border: 1px solid #262626; border-radius: 0.75rem; padding: 1.25rem 1.5rem; }
-    .face-type-card span { font-size: 0.8rem; color: #a3a3a3; font-weight: 500; }
+    .face-types { display: flex; gap: 1.25rem; flex-wrap: wrap; }
 </style>
 </head>
 <body>
@@ -134,7 +132,7 @@ $names = ['Saade', 'Alice', 'Bob', 'Charlie', 'Diana', 'Eve', 'Frank', 'Grace', 
         $showcase = ['Saade', 'Eve', 'Frank', 'Diana'];
         foreach ($showcase as $n):
         ?>
-        <div class="face-type-card">
+        <div class="card">
             <?php echo $facehash->name($n)->size(80)->toSvg(); ?>
             <span><?= htmlspecialchars($n) ?></span>
         </div>
