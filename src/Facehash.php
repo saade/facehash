@@ -4,6 +4,7 @@ namespace Saade\Facehash;
 
 use Saade\Facehash\Data\FacehashData;
 use Saade\Facehash\Enums\FaceType;
+use Saade\Facehash\Enums\Format;
 use Saade\Facehash\Enums\Variant;
 use Saade\Facehash\Support\SvgRenderer;
 
@@ -12,6 +13,8 @@ class Facehash
     protected ?string $name = null;
 
     protected Variant $variant;
+
+    protected Format $format;
 
     protected bool $enableBlink;
 
@@ -28,6 +31,7 @@ class Facehash
         $defaults = $config['defaults'] ?? [];
 
         $this->variant = Variant::tryFrom($defaults['variant'] ?? 'gradient') ?? Variant::Gradient;
+        $this->format = Format::tryFrom($defaults['format'] ?? 'circle') ?? Format::Circle;
         $this->enableBlink = $defaults['blink'] ?? false;
         $this->showInitial = $defaults['initial'] ?? true;
         $this->size = $defaults['size'] ?? 40;
@@ -46,6 +50,14 @@ class Facehash
     {
         $instance = clone $this;
         $instance->variant = $variant instanceof Variant ? $variant : (Variant::tryFrom($variant) ?? Variant::Gradient);
+
+        return $instance;
+    }
+
+    public function format(string|Format $format): static
+    {
+        $instance = clone $this;
+        $instance->format = $format instanceof Format ? $format : (Format::tryFrom($format) ?? Format::Circle);
 
         return $instance;
     }
@@ -93,6 +105,7 @@ class Facehash
             backgroundColor: $color,
             size: $this->size,
             variant: $this->variant,
+            format: $this->format,
             showInitial: $this->showInitial,
             enableBlink: $this->enableBlink,
         );

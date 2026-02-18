@@ -4,6 +4,7 @@ return [
     'defaults' => [
         'size' => 40,
         'variant' => 'gradient',
+        'format' => 'circle',
         'initial' => true,
         'blink' => false,
     ],

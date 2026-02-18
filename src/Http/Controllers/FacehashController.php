@@ -14,6 +14,7 @@ class FacehashController
             'name' => ['required', 'string', 'max:255'],
             'size' => ['sometimes', 'integer', 'min:16', 'max:1024'],
             'variant' => ['sometimes', 'string', 'in:gradient,solid'],
+            'format' => ['sometimes', 'string', 'in:circle,square,squircle'],
             'initial' => ['sometimes'],
             'blink' => ['sometimes'],
             'colors' => ['sometimes', 'array'],
@@ -28,6 +29,10 @@ class FacehashController
 
         if ($request->has('variant')) {
             $facehash = $facehash->variant($request->input('variant'));
+        }
+
+        if ($request->has('format')) {
+            $facehash = $facehash->format($request->input('format'));
         }
 
         if ($request->has('initial')) {

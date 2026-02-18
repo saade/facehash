@@ -58,6 +58,14 @@ Background style. Accepts `'gradient'` or `'solid'`. Default: `'gradient'`.
 Facehash::name('Saade')->variant('solid')->toSvg();
 ```
 
+### `format(string $format)`
+
+Avatar shape. Accepts `'square'`, `'squircle'`, or `'circle'`. Default: `'circle'`.
+
+```php
+Facehash::name('Saade')->format('squircle')->toSvg();
+```
+
 ### `blink(bool $enable = true)`
 
 Adds a CSS blink animation to the eyes inside the SVG. Default: `false`.
@@ -113,6 +121,7 @@ GET /facehash?name=Saade
 | `name`     | string   | *required* | Input string             |
 | `size`     | int      | `40`       | Size in pixels (16–1024) |
 | `variant`  | string   | `gradient` | `gradient` or `solid`    |
+| `format`   | string   | `circle`   | `square`, `squircle`, or `circle` |
 | `initial`  | bool     | `true`     | Show initial letter      |
 | `blink`    | bool     | `false`    | Enable blink animation   |
 | `colors[]` | string[] | —          | Custom hex color palette |
@@ -158,6 +167,7 @@ return [
     'defaults' => [
         'size' => 40,
         'variant' => 'gradient',  // 'gradient' or 'solid'
+        'format' => 'circle',     // 'square', 'squircle', or 'circle'
         'initial' => true,
         'blink' => false,
     ],
@@ -191,7 +201,7 @@ return [
 
 1. The input string is hashed to a deterministic 32-bit integer
 2. The hash selects a **face type** (round, cross, line, curved), a **color**, and a **rotation** (3D look direction)
-3. The SVG renderer composites: circular clip path, background color, gradient overlay, eye shapes, position offset, and initial letter
+3. The SVG renderer composites: clip path (circle, square, or squircle), background color, gradient overlay, eye shapes, position offset, and initial letter
 4. The same string always produces the exact same SVG — across requests, servers, and deployments
 
 The hash function is a direct port of the JavaScript original, producing identical output for any given input.

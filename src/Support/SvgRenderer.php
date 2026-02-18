@@ -4,6 +4,7 @@ namespace Saade\Facehash\Support;
 
 use Saade\Facehash\Data\FacehashData;
 use Saade\Facehash\Data\FaceSvgData;
+use Saade\Facehash\Enums\Format;
 use Saade\Facehash\Enums\Variant;
 
 final class SvgRenderer
@@ -13,6 +14,7 @@ final class SvgRenderer
         string $backgroundColor,
         int $size,
         Variant $variant,
+        Format $format,
         bool $showInitial,
         bool $enableBlink,
     ): string {
@@ -54,14 +56,28 @@ final class SvgRenderer
             $faceY = $faceCenterY - ($totalHeight / 2);
         }
 
-        $clipId = 'clip-' . substr(md5($data->initial . $size), 0, 8);
-        $gradId = 'grad-' . substr(md5($data->initial . $size), 0, 8);
+        $clipId = 'clip-' . substr(md5($data->initial . $size . $format->value), 0, 8);
+        $gradId = 'grad-' . substr(md5($data->initial . $size . $format->value), 0, 8);
+
+        // Build shape elements based on format
+        $half = $size / 2;
+        $clipShape = match ($format) {
+            Format::Circle => '<circle cx="' . $half . '" cy="' . $half . '" r="' . $half . '"/>',
+            Format::Square => '<rect width="' . $size . '" height="' . $size . '"/>',
+            Format::Squircle => '<rect width="' . $size . '" height="' . $size . '" rx="' . round($size * 0.22) . '"/>',
+        };
+
+        $bgShape = match ($format) {
+            Format::Circle => '<circle cx="' . $half . '" cy="' . $half . '" r="' . $half . '" fill="' . $backgroundColor . '"/>',
+            Format::Square => '<rect width="' . $size . '" height="' . $size . '" fill="' . $backgroundColor . '"/>',
+            Format::Squircle => '<rect width="' . $size . '" height="' . $size . '" rx="' . round($size * 0.22) . '" fill="' . $backgroundColor . '"/>',
+        };
 
         $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' . $size . '" height="' . $size . '" viewBox="0 0 ' . $size . ' ' . $size . '" fill="none">';
 
         // Defs: clipPath + optional gradient
         $svg .= '<defs>';
-        $svg .= '<clipPath id="' . $clipId . '"><circle cx="' . ($size / 2) . '" cy="' . ($size / 2) . '" r="' . ($size / 2) . '"/></clipPath>';
+        $svg .= '<clipPath id="' . $clipId . '">' . $clipShape . '</clipPath>';
 
         if ($variant === Variant::Gradient) {
             $svg .= '<radialGradient id="' . $gradId . '" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">';
@@ -75,12 +91,17 @@ final class SvgRenderer
         // Clipped group
         $svg .= '<g clip-path="url(#' . $clipId . ')">';
 
-        // Background circle
-        $svg .= '<circle cx="' . ($size / 2) . '" cy="' . ($size / 2) . '" r="' . ($size / 2) . '" fill="' . $backgroundColor . '"/>';
+        // Background
+        $svg .= $bgShape;
 
         // Gradient overlay
         if ($variant === Variant::Gradient) {
-            $svg .= '<circle cx="' . ($size / 2) . '" cy="' . ($size / 2) . '" r="' . ($size / 2) . '" fill="url(#' . $gradId . ')"/>';
+            $gradShape = match ($format) {
+                Format::Circle => '<circle cx="' . $half . '" cy="' . $half . '" r="' . $half . '" fill="url(#' . $gradId . ')"/>',
+                Format::Square => '<rect width="' . $size . '" height="' . $size . '" fill="url(#' . $gradId . ')"/>',
+                Format::Squircle => '<rect width="' . $size . '" height="' . $size . '" rx="' . round($size * 0.22) . '" fill="url(#' . $gradId . ')"/>',
+            };
+            $svg .= $gradShape;
         }
 
         // Blink animation style

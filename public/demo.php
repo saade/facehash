@@ -7,6 +7,7 @@
  */
 
 require_once __DIR__ . '/../src/Enums/FaceType.php';
+require_once __DIR__ . '/../src/Enums/Format.php';
 require_once __DIR__ . '/../src/Enums/Variant.php';
 require_once __DIR__ . '/../src/Data/FacehashData.php';
 require_once __DIR__ . '/../src/Data/FaceSvgData.php';
@@ -38,6 +39,9 @@ if (str_starts_with($_SERVER['REQUEST_URI'], '/avatar')) {
     }
     if (isset($params['blink'])) {
         $builder = $builder->blink($params['blink'] !== '0' && $params['blink'] !== 'false');
+    }
+    if (isset($params['format'])) {
+        $builder = $builder->format($params['format']);
     }
     if (isset($params['initial'])) {
         $builder = $builder->initial($params['initial'] !== '0' && $params['initial'] !== 'false');
@@ -78,7 +82,7 @@ $names = ['Saade', 'Alice', 'Bob', 'Charlie', 'Diana', 'Eve', 'Frank', 'Grace', 
     .control input, .control select { background: #262626; border: 1px solid #404040; color: #e5e5e5; padding: 0.5rem 0.75rem; border-radius: 0.375rem; font-size: 0.875rem; }
     .control input:focus, .control select:focus { outline: none; border-color: #ec4899; }
     .preview { display: flex; align-items: center; justify-content: center; gap: 2rem; min-height: 180px; }
-    .preview-svg { border-radius: 50%; }
+    .preview-svg { }
     code { background: #262626; padding: 0.125rem 0.5rem; border-radius: 0.25rem; font-size: 0.8rem; color: #ec4899; }
     .face-types { display: flex; gap: 2rem; flex-wrap: wrap; }
     .face-type-card { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; background: #171717; border: 1px solid #262626; border-radius: 0.75rem; padding: 1.25rem 1.5rem; }
@@ -94,14 +98,19 @@ $names = ['Saade', 'Alice', 'Bob', 'Charlie', 'Diana', 'Eve', 'Frank', 'Grace', 
 <!-- Grid of avatars -->
 <section>
     <h2>Gallery</h2>
-    <div class="grid">
+    <?php foreach (['square', 'squircle', 'circle'] as $fmt): ?>
+    <div style="margin-bottom: 0.5rem;">
+        <span style="font-size: 0.75rem; color: #737373; text-transform: uppercase; letter-spacing: 0.05em;"><?= $fmt ?></span>
+    </div>
+    <div class="grid" style="margin-bottom: 1.5rem;">
         <?php foreach ($names as $name): ?>
         <div class="card">
-            <?php echo $facehash->name($name)->size(64)->blink()->toSvg(); ?>
+            <?php echo $facehash->name($name)->size(64)->format($fmt)->blink()->toSvg(); ?>
             <span><?= htmlspecialchars($name) ?></span>
         </div>
         <?php endforeach; ?>
     </div>
+    <?php endforeach; ?>
 </section>
 
 <!-- Face types -->
@@ -158,6 +167,19 @@ $names = ['Saade', 'Alice', 'Bob', 'Charlie', 'Diana', 'Eve', 'Frank', 'Grace', 
             <?php echo $facehash->name('Saade')->size(80)->variant('solid')->toSvg(); ?>
             <span>solid</span>
         </div>
+    </div>
+</section>
+
+<!-- Format -->
+<section>
+    <h2>Format</h2>
+    <div class="row">
+        <?php foreach (['square', 'squircle', 'circle'] as $fmt): ?>
+        <div class="card">
+            <?php echo $facehash->name('Saade')->size(80)->format($fmt)->toSvg(); ?>
+            <span><?= $fmt ?></span>
+        </div>
+        <?php endforeach; ?>
     </div>
 </section>
 
@@ -232,6 +254,14 @@ $names = ['Saade', 'Alice', 'Bob', 'Charlie', 'Diana', 'Eve', 'Frank', 'Grace', 
                 </select>
             </div>
             <div class="control">
+                <label>Format</label>
+                <select id="pg-format" onchange="updatePlayground()">
+                    <option value="square">square</option>
+                    <option value="squircle">squircle</option>
+                    <option value="circle">circle</option>
+                </select>
+            </div>
+            <div class="control">
                 <label>Blink</label>
                 <select id="pg-blink" onchange="updatePlayground()">
                     <option value="1">on</option>
@@ -268,10 +298,11 @@ function updatePlayground() {
     const name = document.getElementById('pg-name').value || 'Saade';
     const size = document.getElementById('pg-size').value || '128';
     const variant = document.getElementById('pg-variant').value;
+    const format = document.getElementById('pg-format').value;
     const blink = document.getElementById('pg-blink').value;
     const initial = document.getElementById('pg-initial').value;
     const img = document.getElementById('pg-img');
-    const params = new URLSearchParams({ name, size, variant, blink, initial });
+    const params = new URLSearchParams({ name, size, variant, format, blink, initial });
     img.src = '/avatar?' + params.toString();
     img.width = size;
     img.height = size;
