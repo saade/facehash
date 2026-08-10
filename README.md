@@ -6,10 +6,12 @@ Deterministic avatar faces from any string. A PHP/Laravel port of the [facehash]
 
 Generates unique, consistent SVG avatars based on a name, email, or any string input. No GD, Imagick, or external services required — pure SVG output.
 
+**[Documentation &amp; playground &rarr;](https://facehash.saade.dev)**
+
 ## Requirements
 
 - PHP 8.2+
-- Laravel 11 or 12
+- Laravel 11, 12 or 13
 
 ## Installation
 
@@ -224,10 +226,22 @@ The hash function is a direct port of the JavaScript original, producing identic
 A standalone demo page is included for testing without Laravel:
 
 ```bash
-php -S localhost:8080 demo.php
+php -S localhost:8080 public/index.php
 ```
 
-Open `http://localhost:8080` to see the avatar gallery, variant comparisons, and an interactive playground.
+Open `http://localhost:8080` for the avatar gallery, variant comparisons and an interactive playground, or `/cover` for the social card.
+
+## Docs site
+
+The documentation at [facehash.saade.dev](https://facehash.saade.dev) is a static site generated from this repo and published to GitHub Pages by `.github/workflows/pages.yml` on every push to `main`. The domain lives in `$siteUrl` at the top of `docs/build.php`, which drives both the canonical/OG URLs and the `CNAME` file in the artifact.
+
+```bash
+php docs/build.php              # build into _site/
+php -S localhost:8080 -t _site  # preview
+node docs/parity.mjs            # check the browser port against the PHP renderer
+```
+
+Every avatar on the page is rendered at build time by the PHP renderer. The playground needs to render arbitrary names in the browser, so `docs/assets/facehash.js` ports the hash and SVG composition to JavaScript — it takes the face paths, sphere positions, palette and defaults from `docs/build.php`'s export of the PHP classes, and `docs/parity.mjs` diffs both implementations across a matrix of inputs so they cannot drift apart.
 
 ## Credits
 

@@ -1,0 +1,4 @@
+/_site
+/vendor
+composer.lock
+.DS_Store
