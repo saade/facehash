@@ -42,7 +42,12 @@ jobs:
       - name: Check the browser port against the PHP renderer
         run: node docs/parity.mjs
 
+      # `enablement: true` creates the Pages site if it is missing instead of
+      # failing with "Get Pages site failed", so the workflow does not depend on
+      # someone having flipped the setting by hand first.
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
