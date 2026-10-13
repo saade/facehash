@@ -239,18 +239,6 @@ composer test
 
 The suite runs on [Pest](https://pestphp.com) with Orchestra Testbench. A handful of tests pin the exact SVG markup as snapshots in `tests/.pest/snapshots`; after an intentional change to the renderer, refresh them with `vendor/bin/pest --update-snapshots`.
 
-## Docs site
-
-The documentation at [facehash.saade.dev](https://facehash.saade.dev) is a static site generated from this repo and published to GitHub Pages by `.github/workflows/pages.yml` on every push to `main`. The domain lives in `$siteUrl` at the top of `docs/build.php`, which drives both the canonical/OG URLs and the `CNAME` file in the artifact.
-
-```bash
-php docs/build.php              # build into _site/
-php -S localhost:8080 -t _site  # preview
-node docs/parity.mjs            # check the browser port against the PHP renderer
-```
-
-Every avatar on the page is rendered at build time by the PHP renderer. The playground needs to render arbitrary names in the browser, so `docs/assets/facehash.js` ports the hash and SVG composition to JavaScript — it takes the face paths, sphere positions, palette and defaults from `docs/build.php`'s export of the PHP classes, and `docs/parity.mjs` diffs both implementations across a matrix of inputs so they cannot drift apart.
-
 ## Credits
 
 This package is a PHP/Laravel port of [facehash](https://facehash.dev) by [Cossistant](https://github.com/cossistantcom/cossistant). The original JavaScript library provides the face SVG data, hash algorithm, and rendering logic that this package faithfully reproduces.
