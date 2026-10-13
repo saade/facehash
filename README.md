@@ -1,5 +1,7 @@
 # Facehash for Laravel
 
+[![Plumb score](https://plumbphp.dev/badges/saade/facehash/composite.svg)](https://plumbphp.dev/saade/facehash)
+
 ![Facehash](art/cover.png)
 
 Deterministic avatar faces from any string. A PHP/Laravel port of the [facehash](https://facehash.dev) JavaScript library.
