@@ -120,7 +120,7 @@ final class SvgRenderer
         foreach ($paths as $i => $d) {
             $class = '';
             if ($enableBlink) {
-                $class = ' class="' . ($i === 0 ? 'fh-eye-right' : 'fh-eye-left') . '"';
+                $class = ' class="fh-eye-' . $svgData['eyes'][$i] . '"';
             }
             $svg .= '<path d="' . $d . '" fill="black"' . $class . '/>';
         }

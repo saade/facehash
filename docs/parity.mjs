@@ -22,14 +22,16 @@ const NAMES = [
     'Saade',
     'a',
     'alice@example.com',
-    'Zoë',              // multi-byte — PHP hashes bytes, so the port must too
+    'Zoë',              // multi-byte — both sides must hash UTF-16 code units
     '日本語',
+    '😀 smile',         // surrogate pair
     'A very long display name with spaces',
     '<script>',         // exercises XML escaping of the initial
     '1234567890',
 ];
 
-const PALETTES = [undefined, ['#6366f1', '#8b5cf6', '#a78bfa'], ['#111111']];
+// The empty palette falls back to the default one on both sides.
+const PALETTES = [undefined, ['#6366f1', '#8b5cf6', '#a78bfa'], ['#111111'], []];
 
 /** Ids are derived from md5() in PHP and FNV-1a in JS — stable, but not equal. */
 const normalize = (svg) => svg.replace(/(clip|grad)-[0-9a-f]+/g, '$1-x');

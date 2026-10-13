@@ -14,7 +14,7 @@ return [
     'route' => [
         'enabled' => false,
         'prefix' => 'facehash',
-        'middleware' => ['web'],
+        'middleware' => [],
         'cache_control' => 'public, max-age=31536000, immutable',
     ],
 ];

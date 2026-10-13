@@ -45,14 +45,14 @@ function escapeXml(value) {
 /**
  * Port of stringHash() from src/Facehash.php.
  *
- * PHP hashes raw bytes (strlen/ord), so we hash the UTF-8 encoding rather than
- * UTF-16 code units — that keeps non-ASCII names in sync with the package.
+ * Both hash UTF-16 code units, the way the original facehash reads a string
+ * with charCodeAt(), so non-ASCII names pick the same face everywhere.
  */
 function stringHash(str) {
     let hash = 0;
 
-    for (const byte of encoder.encode(str)) {
-        hash = ((hash << 5) - hash + byte) | 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0;
     }
 
     return Math.abs(hash);
@@ -103,7 +103,7 @@ export function createFacehash(data) {
         const format = oneOf(options.format ?? defaults.format, ['circle', 'square', 'squircle'], 'circle');
         const palette = options.colors?.length ? options.colors : defaultColors;
         const face = compute(name, palette);
-        const { viewBox, paths } = faces[face.faceType];
+        const { viewBox, eyes, paths } = faces[face.faceType];
 
         // Parse viewBox dimensions
         const [, , vbWidth, vbHeight] = viewBox.split(' ').map(Number);
@@ -194,7 +194,7 @@ export function createFacehash(data) {
         svg += `<svg x="${num(faceX)}" y="${num(faceY)}" width="${num(faceWidth)}" height="${num(faceHeight)}" viewBox="${viewBox}" fill="none" xmlns="http://www.w3.org/2000/svg">`;
 
         paths.forEach((d, i) => {
-            const className = enableBlink ? ` class="${i === 0 ? 'fh-eye-right' : 'fh-eye-left'}"` : '';
+            const className = enableBlink ? ` class="fh-eye-${eyes[i]}"` : '';
             svg += `<path d="${d}" fill="black"${className}/>`;
         });
 

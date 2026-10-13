@@ -25,6 +25,9 @@ class Facehash
     /** @var list<string> */
     protected array $colorPalette;
 
+    /** @var list<string> */
+    protected array $defaultPalette;
+
     public function __construct()
     {
         $config = function_exists('config') ? config('facehash', []) : [];
@@ -35,7 +38,8 @@ class Facehash
         $this->enableBlink = $defaults['blink'] ?? false;
         $this->showInitial = $defaults['initial'] ?? true;
         $this->size = $defaults['size'] ?? 40;
-        $this->colorPalette = $config['colors'] ?? ['#ec4899', '#f59e0b', '#3b82f6', '#f97316', '#10b981'];
+        $this->defaultPalette = ($config['colors'] ?? []) ?: ['#ec4899', '#f59e0b', '#3b82f6', '#f97316', '#10b981'];
+        $this->colorPalette = $this->defaultPalette;
     }
 
     public function name(string $name): static
@@ -90,7 +94,7 @@ class Facehash
     public function colors(array $colors): static
     {
         $instance = clone $this;
-        $instance->colorPalette = $colors;
+        $instance->colorPalette = $colors ?: $this->defaultPalette;
 
         return $instance;
     }
@@ -145,21 +149,19 @@ class Facehash
 
     protected function getColor(int $index): string
     {
-        $palette = count($this->colorPalette) > 0 ? $this->colorPalette : ['#ec4899'];
-
-        return $palette[$index % count($palette)];
+        return $this->colorPalette[$index % count($this->colorPalette)];
     }
 
     /**
      * Port of stringHash() from src/utils/hash.ts.
-     * Uses & 0xFFFFFFFF to simulate JS 32-bit integer behavior.
+     * Uses & 0xFFFFFFFF to simulate JS 32-bit integer behavior, and walks UTF-16
+     * code units because that is what charCodeAt() reads in the original.
      */
     protected static function stringHash(string $str): int
     {
         $hash = 0;
 
-        for ($i = 0, $len = strlen($str); $i < $len; $i++) {
-            $char = ord($str[$i]);
+        foreach (unpack('v*', mb_convert_encoding($str, 'UTF-16LE', 'UTF-8')) as $char) {
             $hash = (($hash << 5) - $hash + $char) & 0xFFFFFFFF;
         }
 

@@ -179,7 +179,7 @@ return [
     'route' => [
         'enabled' => false,
         'prefix' => 'facehash',
-        'middleware' => ['web'],
+        'middleware' => [],
         'cache_control' => 'public, max-age=31536000, immutable',
     ],
 ];
@@ -195,7 +195,7 @@ return [
 
 **`route.prefix`** — URL path for the HTTP endpoint.
 
-**`route.middleware`** — Middleware applied to the route.
+**`route.middleware`** — Middleware applied to the route. Empty by default: the `web` group would start a session and attach cookies to a response that is served as publicly cacheable.
 
 **`route.cache_control`** — Cache-Control header value. The default serves immutable responses cached for 1 year — safe because the same input always produces the same output.
 
@@ -230,6 +230,14 @@ php -S localhost:8080 public/index.php
 ```
 
 Open `http://localhost:8080` for the avatar gallery, variant comparisons and an interactive playground, or `/cover` for the social card.
+
+## Testing
+
+```bash
+composer test
+```
+
+The suite runs on [Pest](https://pestphp.com) with Orchestra Testbench. A handful of tests pin the exact SVG markup as snapshots in `tests/.pest/snapshots`; after an intentional change to the renderer, refresh them with `vendor/bin/pest --update-snapshots`.
 
 ## Docs site
 

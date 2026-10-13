@@ -14,9 +14,26 @@
     "php": "^8.2",
     "illuminate/support": "^11.0|^12.0|^13.0"
   },
+  "require-dev": {
+    "orchestra/testbench": "^9.0|^10.0|^11.0",
+    "pestphp/pest": "^3.0|^4.0"
+  },
   "autoload": {
     "psr-4": {
       "Saade\\Facehash\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Saade\\Facehash\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "pest"
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
     }
   },
   "extra": {

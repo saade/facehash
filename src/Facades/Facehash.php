@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Facade;
 /**
  * @method static \Saade\Facehash\Facehash name(string $name)
  * @method static \Saade\Facehash\Facehash variant(string|\Saade\Facehash\Enums\Variant $variant)
+ * @method static \Saade\Facehash\Facehash format(string|\Saade\Facehash\Enums\Format $format)
  * @method static \Saade\Facehash\Facehash blink(bool $enable = true)
  * @method static \Saade\Facehash\Facehash initial(bool $show = true)
  * @method static \Saade\Facehash\Facehash size(int $size)
